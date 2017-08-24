@@ -11,10 +11,13 @@ Il s'agit d'une station météo connectée à votre réseau wifi (et même à in
 On peut interagir avec cette station météo grâce au logiciel SNAP (sorte de SCRATCH, pour les personnes qui connaissent).
 
 La station météo est composée d'un ensemble de capteurs :
-Baromètre : Capteur de pression (pression et température).
-Hygromètre : Capteur d'humidité (humidité et température).
-Thermomètre : Capteur de température.
-Photo-résistance : Capteur de luminosité.
+* Baromètre : Capteur de pression (pression et température).
+* Hygromètre : Capteur d'humidité (humidité et température).
+* Thermomètre : Capteur de température.
+* Photo-résistance : Capteur de luminosité.
 Plus qu'une station météo, c'est aussi un objet connecté qui interagir avec internet !
+Elle possède en plus :
+* deux entrées pour bouton poussoir
+* deux sorties pour allumer des LED ou activer des relais
 
 Elle s'appuie sur la carte électronique « Wemos D1 mini » qui est une sorte de carte « Arduino » équipé de wifi (elle peut soit se connecter à un réseau wifi, soit être elle-même un réseau wifi et faire office de serveur – ces deux modes peuvent fonctionner en même temps).
