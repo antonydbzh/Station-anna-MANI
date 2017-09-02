@@ -10,6 +10,8 @@ Nous lui dédions cette station météorologique pédagogique, puisse-t-elle ins
 # De quoi s'agit-il ?
 Il s'agit d'une station météo connectée à votre réseau wifi (et même à internet !).
 
+![Photo de la station météo Anna MANI](/images/station-totale2.JPG)
+
 On peut interagir avec cette station météo grâce au logiciel SNAP (sorte de SCRATCH, pour les personnes qui connaissent).
 
 La station météo est composée d'un ensemble de capteurs :
@@ -23,3 +25,13 @@ Elle possède en plus :
 * deux sorties pour allumer des LED ou activer des relais
 
 Elle s'appuie sur la carte électronique « Wemos D1 mini » qui est une sorte de carte « Arduino » équipé de wifi (elle peut soit se connecter à un réseau wifi, soit être elle-même un réseau wifi et faire office de serveur – ces deux modes peuvent fonctionner en même temps).
+
+# Comment l'utiliser ?
+## Avec SNAP!
+![Capture d'écran de SNAP! avec le programme de la station météo](images/SNAP-Anna-mani.jpeg]
+
+## Avec IFTTT
+![Capture d'écran de création d'un "IFTTT"](images/IFTTT-create.jpeg)
+
+## Avec Thingspeak
+![capture d'écran d'une page de Thingspeak](/images/Thingspeak.jpeg)
