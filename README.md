@@ -12,6 +12,8 @@ Il s'agit d'une station météo connectée à votre réseau wifi (et même à in
 
 ![Photo de la station météo Anna MANI](/images/station-totale2.JPG)
 
+![Shéma FRitzing de la station météo Anna MANI](/images/fritzing_stationentiere.png)
+
 On peut interagir avec cette station météo grâce au logiciel SNAP (sorte de SCRATCH, pour les personnes qui connaissent).
 
 La station météo est composée d'un ensemble de capteurs :
