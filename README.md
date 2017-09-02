@@ -28,7 +28,7 @@ Elle s'appuie sur la carte électronique « Wemos D1 mini » qui est une sorte
 
 # Comment l'utiliser ?
 ## Avec SNAP!
-![Capture d'écran de SNAP! avec le programme de la station météo](images/SNAP-Anna-mani.jpeg]
+![Capture d'écran de SNAP! avec le programme de la station météo](images/SNAP-Anna-mani.jpeg)
 
 ## Avec IFTTT
 ![Capture d'écran de création d'un "IFTTT"](images/IFTTT-create.jpeg)
