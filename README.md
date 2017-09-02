@@ -2,7 +2,7 @@
 Des programmes pour un station météo ludo-pédagogique
 Anna MANI – 1918-2001
 
-![Photo de Anna MANI](https://en.wikipedia.org/wiki/Anna_Mani#/media/File:Anna_Mani.jpg "Photo de Anna MANI")
+![Photo de Anna MANI](https://en.wikipedia.org/wiki/Anna_Mani#/media/File:Anna_Mani.jpg)
 
 Scientifique météorologue, elle a réalisé des travaux de recherche sur la couche d'ozone, inventé une sonde de mesure de l'ozone. Elle a travaillé également sur l'énergie solaire thermique et les parcs éoliens en inde. Sa carrière scientifique débute dans le domaine de la physique, sur les propriétés optiques des diamants et des rubis.
 Nous lui dédions cette station météorologique pédagogique, puisse-t-elle inspirer les filles comme les garçons dans le goût pour les sciences et les technologies.
