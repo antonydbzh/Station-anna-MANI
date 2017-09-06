@@ -1,5 +1,5 @@
 # Station-anna-MANI
-Des programmes pour un station météo ludo-pédagogique
+Des programmes pour une station météo ludo-pédagogique
 Anna MANI – 1918-2001
 
 ![Photo de Anna MANI](/images/Anna_Mani.jpg)
