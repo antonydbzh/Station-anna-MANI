@@ -18,6 +18,22 @@
  * Ce programme a été conçu par Julien Rat - les petits débrouillards/Les usines nouveles
  * Modifié par Antony Auffret - les petits débrouillards - CC-By-Sa 2017
 */
+/*
+                            BROCHAGE
+(les numéros interne correspondent aux broche équivalente sur Arduino)                      
+                        _______________                   
+                      /     D1 mini     \                      
+                     |[ ]RST      1-TX[ ]|                   
+   Entrée analogique |[ ]A0-      3-RX[ ]|                    
+        LED1/Relais1 |[ ]D0-16    5-D1[ ]|  BMP280 - SCL
+        LED2/Relais2 |[ ]D5-14    4-D2[ ]|  BMP280 - SDA
+ Entrée bouton - BP1 |[ ]D6-12    0-D3[ ]|  DS18B20    
+ Entrée bouton - BP2 |[ ]D7-13    2-D4[ ]|  LED_BUILTIN         
+               DHT22 |[ ]D8-15     GND[ ]|                    
+                     |[ ]3V3        5V[ ]|                    
+                     |       +---+       |                     
+                     |_______|USB|_______|                     
+*/
 
 //Bibliothèques Wifi//
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
@@ -33,9 +49,10 @@ const char* hostAP = "Anna-MANI";
 /////////////////////////////
 
 // Bibliothèques capteur d'humidité-température //
+#include <Wire.h>
 #include "DHT.h"
-#define DHTPIN D0         // broche où est connectée le capteur DHT11
-#define DHTTYPE DHT11     // choix du capteur : DHT11
+#define DHTPIN D8         // broche où est connectée le capteur DHT22 - D8
+#define DHTTYPE DHT22     // choix du capteur : DHT22
 DHT dht(DHTPIN, DHTTYPE); // création du capteur
 
 // Bibliotheque du capteur de température DS18b20 //
@@ -46,7 +63,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // Bibliotheque du capteur de pression BMP280 //
-#include <Adafruit_BMP280b.h>  //#include <Adafruit_BMP280.h>
+#include <Adafruit_BMP280.h>   //#include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp;           // Initialisation du capteur bmp
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // ATTENTION Pour le capteur version GY BMP280, la bibliothèque a été modifiée.                //
@@ -64,20 +81,21 @@ int tempo = 0;                                //création de la variable tempo,
                                               //servira à temporiser l'envoie de donnée à Thingspeak
 
 //////////Broches//////////
-const int led1 = D8;
-const int led2 = D7;
+const int led1 = D0;
+const int led2 = D5;
 const int bp1 = D6;
-const int bp2 = D5;
+const int bp2 = D7;
 
 void setup() {
   //Prepare la broche GPIO2 (marquée D4 sur le Wemos)
+  Wire.begin(); // démarre le protocole I2C sur les broche par défaut SCL -> D1 et SDA -> D2
   pinMode(2, OUTPUT);
   digitalWrite(2, 1);
   
   Serial.begin(9600); // démarrage de la connexion série
   dht.begin();        // démarrage du capteur dht11
   sensors.begin();    // demarrage capteur ds18b20
-  bmp.begin();        // demarrage du bmp280
+  bmp.begin(0x76);    // demarrage du bmp280 0x76
 
   //Auto connexion au cas ou le wemos ne trouve pas de réseau wifi "familier"
   WiFiManager wifiManager;
