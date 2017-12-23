@@ -2,25 +2,24 @@
 // STATION METEO Anna MANI//
 ///////////////////////////
 /* Programme ludo-pédagogique d'initiation à la pogrammation et à l'internet des objets.
- *  
- * Anna Mani (1918-2001) était une scientifique météorologue indienne. 
- * Elle a réalisé des travaux de recherche sur la couche d'ozone, 
- * inventé une sonde de mesure de l'ozone. 
- * Elle a travaillé également sur l'énergie solaire thermique 
- * et les parcs éoliens en inde. 
- * Sa carrière scientifique débute dans le domaine de la physique, 
- * sur les propriétés optiques des diamants et des rubis.
- * Nous lui dédions cette station météorologique pédagogique, 
- * puisse-t-elle inspirer les filles comme les garçons dans le goût pour les sciences et les technologies.
- * Plus d'infos sur Anna MANI : https://fr.wikipedia.org/wiki/Anna_Mani
- * 
- * Toute la documentation qui accompagne ce programme est disponible sur wikidebrouillard.org.
- * Ce programme a été conçu par Julien Rat - les petits débrouillards/Les usines nouveles
- * Modifié par Antony Auffret - les petits débrouillards - CC-By-Sa 2017
-*/
-/*
+ 
+ Anna Mani (1918-2001) était une scientifique météorologue indienne. 
+ Elle a réalisé des travaux de recherche sur la couche d'ozone, 
+ inventé une sonde de mesure de l'ozone. 
+ Elle a travaillé également sur l'énergie solaire thermique 
+ et les parcs éoliens en inde. 
+ Sa carrière scientifique débute dans le domaine de la physique, 
+ sur les propriétés optiques des diamants et des rubis.
+ Nous lui dédions cette station météorologique pédagogique, 
+ puisse-t-elle inspirer les filles comme les garçons dans le goût pour les sciences et les technologies.
+ Plus d'infos sur Anna MANI : https://fr.wikipedia.org/wiki/Anna_Mani
+ 
+ Toute la documentation qui accompagne ce programme est disponible sur wikidebrouillard.org.
+ Ce programme a été conçu par Julien Rat - les petits débrouillards/Les usines nouveles
+ Modifié par Antony Auffret - les petits débrouillards - CC-By-Sa 2017
+
                             BROCHAGE
-(les numéros interne correspondent aux broche équivalente sur Arduino)                      
+(les numéros interne correspondent aux broches équivalentes sur Arduino - GPIO)                      
                         _______________                   
                       /     D1 mini     \                      
                      |[ ]RST      1-TX[ ]|                   
@@ -33,6 +32,15 @@
                      |[ ]3V3        5V[ ]|                    
                      |       +---+       |                     
                      |_______|USB|_______|                     
+   ___
+ / ___ \
+|_|   | |
+     /_/ 
+     _   ___   _ 
+    |_| |___|_| |_
+         ___|_   _|
+        |___| |_|
+Les petits Débrouillards - CC-By-Sa http://creativecommons.org/licenses/by-nc-sa/3.0/
 */
 
 //Bibliothèques Wifi//
@@ -63,10 +71,10 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // Bibliotheque du capteur de pression BMP280 //
-#include <Adafruit_BMP280.h>   //#include <Adafruit_BMP280.h>
+#include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp;           // Initialisation du capteur bmp
 /////////////////////////////////////////////////////////////////////////////////////////////////
-// ATTENTION Pour le capteur version GY BMP280, la bibliothèque a été modifiée.                //
+// ATTENTION Pour le capteur version GY BMP280, la bibliothèque doit être modifiée.            //
 // Pour le faire vous-même, copiez le fichier Adafruit_BMP280.h, renomez-le Adafruit_BMP280b.h //
 // Identifiez la ligne : #define BMP280_ADDRESS (0x77)                                         //
 // Modifiez la en : #define BMP280_ADDRESS (0x76)                                              //
@@ -87,10 +95,12 @@ const int bp1 = D6;
 const int bp2 = D7;
 
 void setup() {
+
+  Wire.begin();   // démarre le protocole I2C sur les broche par défaut SCL -> D1 et SDA -> D2
+  
   //Prepare la broche GPIO2 (marquée D4 sur le Wemos)
-  Wire.begin(); // démarre le protocole I2C sur les broche par défaut SCL -> D1 et SDA -> D2
   pinMode(2, OUTPUT);
-  digitalWrite(2, 1);
+  digitalWrite(2, 1); // éteint la led de la carte
   
   Serial.begin(9600); // démarrage de la connexion série
   dht.begin();        // démarrage du capteur dht11
@@ -113,7 +123,7 @@ void setup() {
   server.begin();     // demarrage du serveur de fichiers
   digitalWrite(2, 0); // allumage de la led de la carte
 
-  //Définition des broches D8 et D7 en sorties
+  //Définition des broches des led1 et Led2 en sorties
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
 
@@ -129,7 +139,7 @@ void loop() {
 }
 
 void thingspeak() { // Cette fonction envoie les données à Thingspeak
-  if (tempo == 20000){                           // Toutes les 20 secondes, les données sont envoyées
+  if (tempo >= 20000){                           // Toutes les 20 secondes, les données sont envoyées
   float hygrometrie = dht.readHumidity();        // Lit l'Hygrométrie en % (par défaut)
   float temperature = dht.readTemperature();     // Lit la temperature en degrés Celsius (par défaut)
   int analog = analogRead(A0);                   // Lit l'entrée analogique de la station météo
@@ -181,7 +191,7 @@ void thingspeak() { // Cette fonction envoie les données à Thingspeak
   }
   // Le site Thingspeak a besoin de minimum 15 secondes de délais entre 2 envois de données
   tempo = tempo + 1;       //La variable tempo sert à compter 20 secondes (20 000 millisecondes).
-  Serial.println(tempo);  
+  //Serial.println(tempo);  
   delay(1);                //Pause de 1 milliseconde
   return;
 }
