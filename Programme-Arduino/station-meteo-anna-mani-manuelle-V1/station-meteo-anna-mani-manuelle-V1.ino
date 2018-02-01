@@ -2,7 +2,7 @@
 // STATION METEO Anna MANI//
 ///////////////////////////
 /* Programme ludo-pédagogique d'initiation à la pogrammation et à l'internet des objets.
- /!\ NE FONCTIONNE PAS ENCORE /!\ 
+ /!\FONCTIONNE/!\
  Anna Mani (1918-2001) était une scientifique météorologue indienne. 
  Elle a réalisé des travaux de recherche sur la couche d'ozone, 
  inventé une sonde de mesure de l'ozone. 
@@ -48,11 +48,14 @@ Les petits Débrouillards - CC-By-Sa http://creativecommons.org/licenses/by-nc-s
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
-#include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
+
 
 ESP8266WebServer server(80);//objet serveur
 
-const char* hostAP = "Anna-MANI";
+///////CONSTANTE CONEXION ET SERVEUR//////////
+const char* hostAP = "anna-mani"; //Nom de domaine accessible via http://anna-mani.local
+const char* nomDuReseau = "nom de votre réseau wifi";
+const char* motDePasse = "Le mot de passe";
 
 /////////////////////////////
 
@@ -107,15 +110,21 @@ void setup() {
   sensors.begin();    // demarrage capteur ds18b20
   bmp.begin(0x76);    // demarrage du bmp280 0x76
 
-  //Auto connexion au cas ou le wemos ne trouve pas de réseau wifi "familier"
-  WiFiManager wifiManager;
-  wifiManager.autoConnect("AutoConnectAP");  
-  
+  //Connexion au réseau wifi
+  Serial.print("Connexion au réseau : "); Serial.println(nomDuReseau); 
+  WiFi.begin(nomDuReseau, motDePasse);    //Connexion au réseau wifi
+  while (WiFi.status() != WL_CONNECTED) { //tant que le wemos n'est pas connecté
+  digitalWrite(2, 0);   // allumage de la led de la carte
+  delay(500);           // pause d'une demi-seconde
+  Serial.print(".");    // imprimer un "." sur le moniteur série
+  digitalWrite(2, 1);   // éteint de la led de la carte pour clignoter
+  } 
   Serial.println(""); 
   Serial.println("WiFi connecté");
   Serial.println("addresse IP : ");
   Serial.println(WiFi.localIP());  // impression sur le moniteur série de l'adresse IP du serveur du Wemos
 
+  //démarrage du DNS pour le nom de domaine
   MDNS.begin(hostAP);
   MDNS.addService("http", "tcp", 80);
   serveur();
@@ -135,7 +144,7 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  thingspeak();
+  //thingspeak(); décommenter pour publier sur thingspeak si vous avez mis un clé d'API plus haut
 }
 
 void thingspeak() { // Cette fonction envoie les données à Thingspeak
@@ -196,7 +205,7 @@ void thingspeak() { // Cette fonction envoie les données à Thingspeak
   return;
 }
 
-void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer les données lorsqu'on appelle les différentes pages
+void serveur() { //Cette fonction nommée "serveur" est celle qui définit les URL qui vont renvoyer les données lorsqu'on appelle les différentes pages
   // gestion de l'appel de la page http://adresseIP/temp
   // qui renvoit la valeur de la température mesurée par le capteur DHT11  
   server.on("/temp", HTTP_GET, []() {

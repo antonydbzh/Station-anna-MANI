@@ -26,9 +26,9 @@
    Entrée analogique |[ ]A0-      3-RX[ ]|                    
         LED1/Relais1 |[ ]D0-16    5-D1[ ]|  BMP280 - SCL
         LED2/Relais2 |[ ]D5-14    4-D2[ ]|  BMP280 - SDA
- Entrée bouton - BP1 |[ ]D6-12    0-D3[ ]|  DS18B20    
- Entrée bouton - BP2 |[ ]D7-13    2-D4[ ]|  LED_BUILTIN         
-               DHT22 |[ ]D8-15     GND[ ]|                    
+             DS18B20 |[ ]D6-12    0-D3[ ]|  Entrée bouton - BP1
+            DHT11/22 |[ ]D7-13    2-D4[ ]|  LED_BUILTIN         
+  bouton WifiManager |[ ]D8-15     GND[ ]|                    
                      |[ ]3V3        5V[ ]|                    
                      |       +---+       |                     
                      |_______|USB|_______|                     
@@ -52,21 +52,21 @@ Les petits Débrouillards - CC-By-Sa http://creativecommons.org/licenses/by-nc-s
 
 ESP8266WebServer server(80);//objet serveur
 
-const char* hostAP = "Anna-MANI";
+const char* hostAP = "anna-maniv3";
 
 /////////////////////////////
 
 // Bibliothèques capteur d'humidité-température //
 #include <Wire.h>
 #include "DHT.h"
-#define DHTPIN D8         // broche où est connectée le capteur DHT22 - D8
-#define DHTTYPE DHT11     // choix du capteur : DHT22
+#define DHTPIN D7         // broche où est connectée le capteur
+#define DHTTYPE DHT11     // choix du capteur : DHT22 ou DHT11
 DHT dht(DHTPIN, DHTTYPE); // création du capteur
 
 // Bibliotheque du capteur de température DS18b20 //
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#define ONE_WIRE_BUS D3   // Capteur sur la broche D3
+#define ONE_WIRE_BUS D6   // Capteur sur la broche D6
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
@@ -81,7 +81,7 @@ Adafruit_BMP280 bmp;           // Initialisation du capteur bmp
 // source https://www.tala-informatique.fr/wiki/index.php/Arduino_BMP280                       //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Publication sur Thingspeak //
+//Publication sur Thingspeak // il faut penser à décommenter l'appel à "thingspeak()" dans la boucle principale
 String apiKey = "XXXXXXXXXXXXXXXX";           //c'est ici qu'on place la clé d'API de Thingspeak 
 const char* serverpub = "api.thingspeak.com"; //adresse du serveur thingspeak pour publier
 WiFiClient client;                            //démarrage du client Wifi
@@ -91,8 +91,8 @@ int tempo = 0;                                //création de la variable tempo,
 //////////Broches//////////
 const int led1 = D0;
 const int led2 = D5;
-const int bp1 = D6;
-const int bp2 = D7;
+const int bp1 = D3;
+#define brocheBouton D7
 
 void setup() {
 
@@ -108,6 +108,8 @@ void setup() {
   bmp.begin(0x76);    // demarrage du bmp280 0x76
 
   //Auto connexion au cas ou le wemos ne trouve pas de réseau wifi "familier"
+  // ici choix de configuration à faire voir programme  :
+  wifimanager-testondemand
   WiFiManager wifiManager;
   wifiManager.autoConnect("AutoConnectAP");  
   
@@ -128,14 +130,15 @@ void setup() {
   pinMode(led2, OUTPUT);
 
   //Définition des broches en entrées des boutons poussoirs
-  pinMode(bp1, INPUT_PULLUP); //on utilise les résistances de pullup interne
-  pinMode(bp2, INPUT_PULLUP);
-  digitalWrite(bp2, HIGH);
+  pinMode(bp1, INPUT_PULLUP); //on utilise la résistance de pullup interne
+  digitalWrite(bp1, HIGH);
+  pinMode(brocheBouton, INPUT);
+  
 }
 
 void loop() {
   server.handleClient();
-  thingspeak();
+//  thingspeak(); décommentez cette ligne pour activer la publication sur Thingspeak
 }
 
 void thingspeak() { // Cette fonction envoie les données à Thingspeak
@@ -148,6 +151,7 @@ void thingspeak() { // Cette fonction envoie les données à Thingspeak
   if (isnan(hygrometrie) || isnan(temperature)) {// Controle s'il y a des erreurs de lecture sur le capteur DHT11.
     Serial.println("");
     Serial.println("Lecture du capteur DHT : Echec !");
+    delay(500);
     thingspeak();
   }
   
@@ -202,6 +206,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/temp", HTTP_GET, []() {
     float temperature = dht.readTemperature();          // Lit la température et l'affecte à la variable température
     server.send(200, "text/json", String(temperature)); // Renvoie une page web avec le contenu de la variable température
+    Serial.println(temperature);                         // L'écrit sur le moniteur série
   });
 
   // gestion de l'appel de la page http://adresseIP/hum
@@ -209,6 +214,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/hum", HTTP_GET, []() {                    
     float hygrometrie = dht.readHumidity();             // Lit l'hygrométrie et l'affecte à la variable hygrometrie
     server.send(200, "text/json", String(hygrometrie)); // Renvoie une page web avec le contenu de la variable hygrometrie
+    Serial.println(hygrometrie);                         // L'écrit sur le moniteur série
   });
 
   // gestion de l'appel de la page http://adresseIP/led1_on
@@ -216,6 +222,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/led1_on", HTTP_GET, []() {
     digitalWrite(led1, HIGH);                         // Met la broche led1 en HIGH, ce qui allume la led
     server.send(200, "text/json", "ON");              // Renvoie une page web avec le mot "ON"
+    Serial.println("la LED1 est allumée");             // L'écrit sur le moniteur série
   });
   
   // gestion de l'appel de la page http://adresseIP/led1_off
@@ -223,6 +230,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/led1_off", HTTP_GET, []() {
     digitalWrite(led1, LOW);                          // Met la broche led1 en LOW, ce qui éteint la led
     server.send(200, "text/json", "OFF");             // Renvoie une page web avec le mot "OFF"
+    Serial.println("La LED1 est éteinte");            // L'écrit sur le moniteur série
   });
 
   // gestion de l'appel de la page http://adresseIP/led2_on
@@ -230,6 +238,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/led2_on", HTTP_GET, []() {
     digitalWrite(led2, HIGH);                         // Met la broche led2 en HIGH, ce qui allume la led
     server.send(200, "text/json", "ON");              // Renvoie une page web avec le mot "ON"
+    Serial.println("la LED2 est allumée");             // L'écrit sur le moniteur série
   });
 
   // gestion de l'appel de la page http://adresseIP/led2_off
@@ -237,6 +246,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/led2_off", HTTP_GET, []() {
     digitalWrite(led2, LOW);                          // Met la broche led2 en LOW, ce qui éteint la led
     server.send(200, "text/json", "OFF");             // Renvoie une page web avec le mot "OFF"
+    Serial.println("La LED2 est éteinte");            // L'écrit sur le moniteur série
   });
   
   // gestion de l'appel de la page http://adresseIP/analog
@@ -277,6 +287,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
     sensors.requestTemperatures();
     int temperature = sensors.getTempCByIndex(0);       // Lit la température et l'affecte à la variable temperature
     server.send(200, "text/json", String(temperature)); // Renvoie une page web avec le contenu de la variable temperature
+    Serial.println(temperature);                        // L'écrit sur le moniteur série
     digitalWrite(2, 0);
   });
 
@@ -285,6 +296,7 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/temp_bmp", HTTP_GET, []() {   
     int temperature = bmp.readTemperature();            // Lit la température et l'affecte à la variable temperature
     server.send(200, "text/json", String(temperature)); // Renvoie une page web avec le contenu de la variable temperature
+    Serial.println(temperature);                        // L'écrit sur le moniteur série
   });
 
   // gestion de l'appel de la page http://adresseIP/press_bmp 
@@ -292,5 +304,6 @@ void serveur() { //Cette fonction nommée "Serveur" est celle qui va renvoyer le
   server.on("/press_bmp", HTTP_GET, []() {
     float pression = bmp.readPressure()/100.0;          // Lit la pression et l'affecte à la variable pression
     server.send(200, "text/json", String(pression));    // Renvoie une page web avec le contenu de la variable pression
+    Serial.println(pression);                           // L'écrit sur le moniteur série
   });
 }
