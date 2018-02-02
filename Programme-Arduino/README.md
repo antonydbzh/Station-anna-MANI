@@ -5,11 +5,19 @@
 # Programme "station-meteo-anna-mani-manuelle-V1"
 Dans ce programme on rentre manuellement le nom du réseau Wifi ainsi que le mot de passe de celui-ci.
 Vous pouvez également :
-* Activer la publication sur Thingspeak (avec une clé d'API ET en dé-commentant la fonction Thingspeak() dans la boucle "Void Loop"
-* Modifier le nom de domaine de la station
+* La Led de la carte clignote tant que la connexion n'est pas établie (elle est allumée si la connexion fonctionne).
+* Activer la publication sur Thingspeak (avec une clé d'API ET en dé-commentant la fonction Thingspeak() dans la boucle "Void Loop".
+* Modifier le nom de domaine de la station.
 
 # Programme "station-meteo-anna-mani-v2"
 * Version en cours de détermination !
+Idées :
+* régler le problème "thingspeak" : boucle trop rapide si pas de capteur DHT qui provoque la déconnexion.
+* meilleur suivi des opération sur le moniteur série
+* bouton sur une page web.
+* second bouton qui twitte ou autre (type IFTTT).
+* Se fixer comme objectif de se passer de l'IDE Arduino une foi le programme chargé ?
+*...
 
 # Programme " station-meteo-anna-mani-v3"
 * En cours de modification pour activer l'autoconnexion avec un bouton poussoir
